@@ -1,0 +1,85 @@
+name: build-publish
+  
+on: 
+  push:
+    branches:
+      - master
+    tags:
+      - '*.*.*'
+  workflow_dispatch:
+  pull_request:
+    # - master
+
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .\src
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+  PLATFORM: Any CPU
+
+jobs:
+  build_test_publish:
+    name: Build, run unit test
+    runs-on: windows-2019
+
+    steps:        
+    # - name: Download and install nunit console runner
+    #   run: |
+    #     Invoke-WebRequest -Uri https://github.com/nunit/nunit-console/releases/download/v3.12/NUnit.Console-3.12.0.msi -Outfile NUnit.Console-3.12.0.msi
+    #     Start-Process -FilePath "msiexec.exe"  -ArgumentList "/quiet", "/i", """NUnit.Console-3.12.0.msi"""
+
+    - name: Git configuration
+      run: git config --global core.autocrlf false
+
+    - uses: actions/checkout@v2
+
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+    - name: Check output to get version number
+      env:
+        STEP_RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      run: |
+        echo "step_Release_version is $STEP_RELEASE_VERSION"
+        if ($env:STEP_RELEASE_VERSION -eq $null -or $env:STEP_RELEASE_VERSION -eq '') {
+          echo "Setting release version to 0.0.0"
+          echo "RELEASE_VERSION=0.0.0" >> $env:GITHUB_ENV
+          echo "PUBLISH=$False" >> $env:GITHUB_ENV
+        }
+        else {
+          echo "Setting release_version to the tag version"
+          echo "RELEASE_VERSION=${{ steps.vars.outputs.tag }}" >> $env:GITHUB_ENV
+          echo "PUBLISH=$True" >> $env:GITHUB_ENV
+        }
+    
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore $env:SOLUTION_FILE_PATH
+
+    - name: Build
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}},FileVersion=${{env.Version}},Version=${{env.Version}} ${{env.SOLUTION_FILE_PATH}}
+      env:
+        Version: ${{ env.RELEASE_VERSION }}
+
+
+
+
