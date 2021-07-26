@@ -40,7 +40,9 @@ jobs:
 
     - name: Set output
       id: get_version
-      run: echo ::set-output name=VersionFromTag::${GITHUB_REF#refs/tags/}
+      run: |
+        set version=%GITHUB_REF:*tags/=%
+        echo "::set-output name=VersionFromTag::%version"
 
       #id: vars
       #run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
