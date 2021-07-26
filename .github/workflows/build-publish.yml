@@ -50,6 +50,7 @@ jobs:
         STEP_RELEASE_VERSION: ${{ steps.get_version.outputs.VersionFromTag }}
       run: |
         echo "step_Release_version is $STEP_RELEASE_VERSION"
+        echo "The VersionFromTag is ${{ steps.get_version.outputs.VersionFromTag }}"
         if ($env:STEP_RELEASE_VERSION -eq $null -or $env:STEP_RELEASE_VERSION -eq '') {
           echo "Setting release version to 0.0.0"
           echo "RELEASE_VERSION=0.0.0" >> $env:GITHUB_ENV
