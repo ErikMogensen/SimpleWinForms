@@ -1,13 +1,14 @@
 name: build-publish
   
 on: 
-  push:
-    branches:
-      - master
-    tags:
-      - '*.*.*'
+  # push:
+  #   branches:
+  #     - master
+  #   tags:
+  #     - '*.*.*'
   workflow_dispatch:
   pull_request:
+  release:
     # - master
 
 
@@ -79,6 +80,29 @@ jobs:
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}},FileVersion=${{env.Version}},Version=${{env.Version}} ${{env.SOLUTION_FILE_PATH}}
       env:
         Version: ${{ env.RELEASE_VERSION }}
+
+
+    - name: Create filenames for zip 
+      if: ${{ env.PUBLISH == 'True' }}
+      run: |
+        $stepFilename = "SimpleWinForms-$($env:RELEASE_VERSION)"
+        echo "ZipFilename=$stepFilename.zip" >> $env:GITHUB_ENV
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Compress output
+      if: ${{ env.PUBLISH == 'True' }}
+      run: |
+        7z a $env:ZipFilename $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release\*.*
+        
+    - name: Upload build output zipped
+      if: ${{ env.PUBLISH == 'True' }}
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        gh release upload ${{ env.VERSION }}  $env:ZipFilename $env:NupkgFilename
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
