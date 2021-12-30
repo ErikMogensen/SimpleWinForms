@@ -24,7 +24,7 @@ env:
 
 jobs:
   build_test_publish:
-    name: Build, run unit test
+    name: Build, run unit tests
     runs-on: windows-2019
 
     steps:        
