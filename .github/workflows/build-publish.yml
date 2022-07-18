@@ -25,7 +25,7 @@ env:
 jobs:
   build_test_publish:
     name: Build, run unit tests
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:        
     # - name: Download and install nunit console runner
