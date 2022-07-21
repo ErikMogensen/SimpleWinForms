@@ -1,0 +1,108 @@
+name: build-test
+  
+on: 
+  workflow_call:
+  workflow_dispatch:
+
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+  PLATFORM: Any CPU
+
+jobs:
+  publish:
+    name: publish
+    runs-on: windows-2022
+
+    steps:
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+      
+    - uses: actions/checkout@3
+
+    #- name: See what we got
+    #  run: dir  $env:GITHUB_WORKSPACE\Mainapp\bin\Release\net462
+
+    - name: Get cached build
+      id: get-cached-build
+      uses: actions/cache@v3.0.5
+      with:
+        path: MainApp/bin/Release/net462
+        key: cached-output
+
+    - name: Did we get the cache
+      if: steps.get-cached-build.outputs.cache-hit == 'true'
+      run: echo "We got the DUKE!"
+
+    - name: Did we get the cache
+      if: steps.get-cached-build.outputs.cache-hit != 'true'
+      run: echo "We dont have the duke"
+
+    #- name: See what we got
+    #  run: dir  $env:GITHUB_WORKSPACE\Mainapp\bin\Release\net462
+
+    - name: show build number works
+      run: echo "GITHUB_RUN_ID is $env:GITHUB_RUN_ID"
+      
+    - name: show build number 2 - not works
+      run: echo "GITHUB_RUN_ID is ${{env.GITHUB_RUN_ID}}"
+
+    - name: show build just 
+      run: echo "BUILD_CONFIGURATION is $BUILD_CONFIGURATION"
+
+    - name: show build -wroks
+      run: echo "BUILD_CONFIGURATION is ${{env.BUILD_CONFIGURATION}}"
+      
+    - name: Show workspace
+      run: echo "GITHUB_WORKSPACE using env $env:GITHUB_WORKSPACE"
+
+    - name: Remove ALL xml files.
+      run: | 
+        Push-Location $env:GITHUB_WORKSPACE\MainApp\bin\Release\net462
+        Get-ChildItem -Include *.xml -Recurse | % { Remove-Item $_.FullName }
+        Pop-Location
+
+    - name: Reset VERIFICATION file.
+      run:  |
+        (Set-Content -Value "VERIFICATION=MD5" -Path $env:GITHUB_WORKSPACE\VERIFICATION.txt)
+      
+    - name: Generate verification file
+      run: .\Generate-VerificationFile.ps1 -Version $env:RELEASE_VERSION -TemplateFilePath VERIFICATION-Template.txt -ExePath "$env:GITHUB_WORKSPACE\MainApp\bin\Release\net462\MainApp.exe" -OutputFilePath "$env:GITHUB_WORKSPACE\MainApp\bin\Release\net462\VERIFICATION.txt"
+
+    - name: Modify .nuspec file
+      run: (Get-Content $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec).Replace("`$version`$", "$env:RELEASE_VERSION") | Set-Content $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec
+
+    - name: Pack Chocolatey 
+      run: choco pack $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec
+
+    - name: Create filenames for zip and nupkg
+      run: |
+        $stepFilename = "MainApp-$($env:RELEASE_VERSION)"
+        echo "ZipFilename=$stepFilename.zip" >> $env:GITHUB_ENV
+        echo "NupkgFilename=$stepFilename.nupkg" >> $env:GITHUB_ENV
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Compress output
+      run: |
+        7z a $env:ZipFilename $env:GITHUB_WORKSPACE\MainApp\bin\Release\net462\*.*
+        
+    - name: Upload build output zipped
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        gh release upload ${{ env.VERSION }}  $env:ZipFilename $env:NupkgFilename
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  

@@ -1,0 +1,101 @@
+name: build-test
+  
+on: 
+  workflow_call:
+    inputs:
+      release-version:
+        required: true
+        type: string
+  workflow_dispatch:
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+  PLATFORM: Any CPU
+
+jobs:
+  build_test_publish:
+    name: Build and run unit tests
+    runs-on: windows-2022
+
+    steps:     
+    
+    - name: Download and install nunit console runner
+      run: |
+        Invoke-WebRequest -Uri https://github.com/nunit/nunit-console/releases/download/3.15.2/NUnit.Console-3.15.2.msi -Outfile NUnit.Console-3.15.2.msi
+        Start-Process -FilePath "msiexec.exe"  -ArgumentList "/quiet", "/i", """NUnit.Console-3.15.2.msi"""
+
+    - name: Git configuration
+      run: git config --global core.autocrlf false
+
+    - uses: actions/checkout@v3
+
+    - name: Add MSBuild for VS 2022 to PATH 
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x86
+        vs-version: '[17.2,18.0)'
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore $env:SOLUTION_FILE_PATH
+
+    #- name: Show version
+    #  run: echo "inputs.release-version is ${{ inputs.release-version }}"
+
+    - name: Build
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}},FileVersion=${{env.Version}},Version=${{env.Version}} ${{env.SOLUTION_FILE_PATH}}
+      env:
+        Version: ${{ inputs.release-version }}
+
+    # - name: See what we got
+    #   run: dir  $env:GITHUB_WORKSPACE\BothFrameworks.Tests
+
+    - name: Run tests
+      run: |
+        $process = Start-Process -FilePath "C:\Program Files (x86)\NUnit.org\nunit-console\nunit3-console.exe"  -ArgumentList "$env:GITHUB_WORKSPACE\BothFrameworks.Tests\BothFrameworks.Tests.csproj", "--config=${{env.BUILD_CONFIGURATION}}" -PassThru
+        Wait-Process -InputObject $process
+        Get-Content -Path .\TestResult.xml
+        if ($process.ExitCode -ne 0) {throw "Unit tests failed (exit code = $($process.ExitCode))" }
+
+
+    - name: See what we got
+      run: dir  $env:GITHUB_WORKSPACE\Mainapp\bin\Release\net462
+
+    - name: Cache build
+      uses: actions/cache@v3.0.5
+      with:
+        path: MainApp/bin/Release/net462
+        key: cached-output
+
+    - name: show build number works
+      run: echo "GITHUB_RUN_ID is $env:GITHUB_RUN_ID"
+      
+    - name: show build number 2 - not works
+      run: echo "GITHUB_RUN_ID is ${{env.GITHUB_RUN_ID}}"
+
+    - name: show build just 
+      run: echo "BUILD_CONFIGURATION is $BUILD_CONFIGURATION"
+
+    - name: show build -wroks
+      run: echo "BUILD_CONFIGURATION is ${{env.BUILD_CONFIGURATION}}"
+      
+    - name: Show workspace
+      run: echo "GITHUB_WORKSPACE using env $env:GITHUB_WORKSPACE"
+
+  

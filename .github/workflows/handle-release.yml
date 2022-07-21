@@ -1,0 +1,61 @@
+name: Handle release
+
+on:
+  push:
+    tags: 
+      - '[1-9]+.[0-9]+.[0-9]+*'
+  workflow_dispatch:
+
+      #- 'releases/[1-9]+.[0-9]+.[0-9]+'
+jobs:
+  show-variables:
+    needs: get-version
+    runs-on: windows-2022
+
+    steps:
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Show release version input
+      run: echo "needs.get-version.outputs.release-version  ${{ needs.get-version.outputs.release-version }} - so"
+
+  get-version:
+    runs-on: windows-2022
+    steps:
+
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+    - name: Check output to get version number
+      env:
+        STEP_RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+      run: |
+        echo "step_Release_version is $STEP_RELEASE_VERSION"
+        if ($env:STEP_RELEASE_VERSION -eq $null -or $env:STEP_RELEASE_VERSION -eq '') {
+          echo "Setting release version to 0.0.0"
+          echo "RELEASE_VERSION=0.0.0" >> $env:GITHUB_ENV
+        }
+        else {
+          echo "Setting release_version to the tag version"
+          echo "RELEASE_VERSION=${{ steps.vars.outputs.tag }}" >> $env:GITHUB_ENV
+        }
+    
+    outputs:
+        release-version: ${{ env.RELEASE_VERSION }}
+
+  call-build-test:
+    needs: get-version
+    uses: ./.github/workflows/build-test.yml
+    with: 
+      release-version: ${{ needs.get-version.outputs.release-version }}
+
+  publish-it:
+    needs: call-build-test
+    uses: ./.github/workflows/publish.yml

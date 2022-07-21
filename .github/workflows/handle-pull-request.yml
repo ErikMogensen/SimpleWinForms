@@ -1,0 +1,32 @@
+name: Handle pull request
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
+
+jobs:
+  show-variables:
+    runs-on: windows-2022
+
+    steps:
+
+    - name: Set the value
+      id: step_one
+      run: |
+        echo "action_state=yellow" >> $env:GITHUB_ENV
+        
+    - name: Use the value
+      id: step_two
+      run: |
+        echo "Color ${{ env.action_state }} and end of it" # This will output 'yellow'
+
+  call-build-test:
+    needs: show-variables
+    uses: ./.github/workflows/build-test.yml
+    with: 
+      release-version: '0.0.0'
+
+
