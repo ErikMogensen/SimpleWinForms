@@ -9,12 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  # Path to the solution file relative to the root of the project.
   SOLUTION_FILE_PATH: .
-
-  # Configuration type to build.
-  # You can convert this to a build matrix if you need coverage of multiple configuration types.
-  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
   PLATFORM: Any CPU
 
@@ -25,10 +20,10 @@ jobs:
 
     steps:     
     
-    - name: Download and install nunit console runner
-      run: |
-        Invoke-WebRequest -Uri https://github.com/nunit/nunit-console/releases/download/3.15.2/NUnit.Console-3.15.2.msi -Outfile NUnit.Console-3.15.2.msi
-        Start-Process -FilePath "msiexec.exe"  -ArgumentList "/quiet", "/i", """NUnit.Console-3.15.2.msi"""
+    #- name: Download and install nunit console runner v3.15.2
+    #  run: |
+    #    Invoke-WebRequest -Uri https://github.com/nunit/nunit-console/releases/download/3.15.2/NUnit.Console-3.15.2.msi -Outfile NUnit.Console-3.15.2.msi
+    #    Start-Process -FilePath "msiexec.exe"  -ArgumentList "/quiet", "/i", """NUnit.Console-3.15.2.msi"""
 
     - name: Git configuration
       run: git config --global core.autocrlf false
@@ -53,8 +48,8 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore $env:SOLUTION_FILE_PATH
 
-    #- name: Show version
-    #  run: echo "inputs.release-version is ${{ inputs.release-version }}"
+    - name: Show version
+      run: echo "inputs.release-version is ${{ inputs.release-version }}"
 
     - name: Build
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
@@ -66,18 +61,18 @@ jobs:
     # - name: See what we got
     #   run: dir  $env:GITHUB_WORKSPACE\BothFrameworks.Tests
 
-    - name: Run tests
-      run: |
-        $process = Start-Process -FilePath "C:\Program Files (x86)\NUnit.org\nunit-console\nunit3-console.exe"  -ArgumentList "$env:GITHUB_WORKSPACE\BothFrameworks.Tests\BothFrameworks.Tests.csproj", "--config=${{env.BUILD_CONFIGURATION}}" -PassThru
-        Wait-Process -InputObject $process
-        Get-Content -Path .\TestResult.xml
-        if ($process.ExitCode -ne 0) {throw "Unit tests failed (exit code = $($process.ExitCode))" }
+    #- name: Run tests
+    #  run: |
+    #    $process = Start-Process -FilePath "C:\Program Files (x86)\NUnit.org\nunit-console\nunit3-console.exe"  -ArgumentList "$env:GITHUB_WORKSPACE\BothFrameworks.Tests\BothFrameworks.Tests.csproj", "--config=${{env.BUILD_CONFIGURATION}}" -PassThru
+    #    Wait-Process -InputObject $process
+    #    Get-Content -Path .\TestResult.xml
+    #    if ($process.ExitCode -ne 0) {throw "Unit tests failed (exit code = $($process.ExitCode))" }
 
 
     - name: See what we got
-      run: dir  $env:GITHUB_WORKSPACE\Mainapp\bin\Release\net462
+      run: dir  $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release
 
-    - name: Cache build
+    - name: Cache build output
       uses: actions/cache@v3.0.5
       with:
         path: MainApp/bin/Release/net462
