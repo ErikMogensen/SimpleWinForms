@@ -8,23 +8,6 @@ on:
       # - '[0-9]+.[0-9]+.[0-9]+**'
       #- 'releases/[1-9]+.[0-9]+.[0-9]+'
 jobs:
-  show-variables:
-    needs: get-version
-    runs-on: windows-2022
-
-    steps:
-
-    - name: Dump env
-      run: env | sort
-   
-    - name: Dump GitHub context
-      env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
-    - name: Show release version input
-      run: echo "needs.get-version.outputs.release-version  ${{ needs.get-version.outputs.release-version }} - so"
-
   get-version:
     runs-on: windows-2022
     steps:
@@ -52,6 +35,23 @@ jobs:
 
     outputs:
         release-version: ${{ env.RELEASE_VERSION }}
+
+  show-variables:
+    needs: get-version
+    runs-on: windows-2022
+
+    steps:
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Show release version input
+      run: echo "needs.get-version.outputs.release-version  ${{ needs.get-version.outputs.release-version }} - so"
 
   # call-build-test:
   #   needs: get-version
