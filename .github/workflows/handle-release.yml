@@ -12,17 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Set output
-        id: extract-tag
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+    - name: Set output
+      id: extract-tag
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.extract-tag.outputs.tag }}
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ steps.extract-tag.outputs.tag }}
-
+    - name: Check output
+      env:
+        RELEASE_VERSION: ${{ steps.extract-tag.outputs.tag }}
+      run: |
+        echo $RELEASE_VERSION
+        echo ${{ steps.extract-tag.outputs.tag }}
 
     - name: Set output
       id: vars
