@@ -9,8 +9,20 @@ on:
       #- 'releases/[1-9]+.[0-9]+.[0-9]+'
 jobs:
   get-version:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
+
+      - name: Set output
+        id: extract-tag
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.extract-tag.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.extract-tag.outputs.tag }}
+
 
     - name: Set output
       id: vars
@@ -20,7 +32,7 @@ jobs:
       env:
         STEP_RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
       run: |
-        echo "step_Release_version is $STEP_RELEASE_VERSION"
+        echo "step_Release_version is $env:STEP_RELEASE_VERSION"
         if ($env:STEP_RELEASE_VERSION -eq $null -or $env:STEP_RELEASE_VERSION -eq '') {
           echo "Setting release version to 0.0.0"
           echo "RELEASE_VERSION=0.0.0" >> $env:GITHUB_ENV
@@ -62,3 +74,4 @@ jobs:
   # publish-it:
   #   needs: call-build-test
   #   uses: ./.github/workflows/publish.yml
+git 
