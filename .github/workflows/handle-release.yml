@@ -8,8 +8,38 @@ on:
 
       #- 'releases/[1-9]+.[0-9]+.[0-9]+'
 jobs:
+  check-tag-branch:
+    # This job is based on replies in https://github.community/t/how-to-create-filter-on-both-tag-and-branch/16936/6
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get tag commit hash
+      id: tag-commit-hash
+      run: |
+        hash=${{ github.sha }}
+        echo "::set-output name=tag-hash::${hash}"
+        echo $hash
+
+    - name: checkout master
+      uses: actions/checkout@v3
+      with:
+        ref: master
+
+    - name: Get latest master commit hash
+      id: master-commit-hash
+      run: |
+        hash=$(git log -n1 --format=format:"%H")
+        echo "::set-output name=master-hash::${hash}"
+        echo $hash
+
+    - name: Exit if tag commit hash don't match master commit hash
+      if: steps.tag-commit-hash.outputs.tag-hash != steps.master-commit-hash.outputs.master-hash
+      run: |
+        echo "Tag was not on the master branch. Exiting."
+        exit 1
+
   get-version:
     runs-on: windows-2022 #ubuntu-latest
+    needs: check-tag-branch
     steps:
     - name: Get version from tag
       id: extract-tag
