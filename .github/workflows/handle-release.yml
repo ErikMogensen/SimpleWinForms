@@ -74,3 +74,5 @@ jobs:
   publish-it:
     needs: call-build-test
     uses: ./.github/workflows/publish.yml
+    with: 
+      release-version: ${{ needs.get-version.outputs.release-version }}
