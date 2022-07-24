@@ -25,7 +25,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
       run: echo "$GITHUB_CONTEXT"
       
-    - uses: actions/checkout@3
+    - uses: actions/checkout@v3
 
     #- name: See what we got
     #  run: dir  $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release
@@ -34,7 +34,7 @@ jobs:
       id: get-cached-build
       uses: actions/cache@v3.0.5
       with:
-        path: SimpleWinForms/bin/Release
+        path: src/SimpleWinForms/bin/Release
         key: cached-output
 
     - name: Did we get the cache
@@ -84,9 +84,8 @@ jobs:
 
     - name: Create filenames for zip and nupkg
       run: |
-        $stepFilename = "MainApp-$($env:RELEASE_VERSION)"
+        $stepFilename = "simpleWinForms-$($env:RELEASE_VERSION)"
         echo "ZipFilename=$stepFilename.zip" >> $env:GITHUB_ENV
-        echo "NupkgFilename=$stepFilename.nupkg" >> $env:GITHUB_ENV
 
     - name: Dump env
       run: env | sort

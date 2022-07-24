@@ -1,7 +1,6 @@
 name: Handle pull request
 
 on:
-  push:
   pull_request:
     branches:
       - develop
