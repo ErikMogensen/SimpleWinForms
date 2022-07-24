@@ -95,6 +95,12 @@ jobs:
       run: |
         7z a $env:ZipFilename $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release\*.*
         
+    - name: Upload build output zipped
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        gh release create ${{ env.VERSION }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
 
     - name: Upload build output zipped
     # missing $env:NupkgFilename on the gh command line

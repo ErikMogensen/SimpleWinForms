@@ -65,12 +65,12 @@ jobs:
     - name: Show release version input
       run: echo "needs.get-version.outputs.release-version  ${{ needs.get-version.outputs.release-version }} - so"
 
-  # call-build-test:
-  #   needs: get-version
-  #   uses: ./.github/workflows/build-test.yml
-  #   with: 
-  #     release-version: ${{ needs.get-version.outputs.release-version }}
+  call-build-test:
+    needs: get-version
+    uses: ./.github/workflows/build-test.yml
+    with: 
+      release-version: ${{ needs.get-version.outputs.release-version }}
 
-  # publish-it:
-  #   needs: call-build-test
-  #   uses: ./.github/workflows/publish.yml
+  publish-it:
+    needs: call-build-test
+    uses: ./.github/workflows/publish.yml
