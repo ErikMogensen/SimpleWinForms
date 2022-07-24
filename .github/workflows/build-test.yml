@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  SOLUTION_FILE_PATH: .
+  SOLUTION_FILE_PATH: .\src
   BUILD_CONFIGURATION: Release
   PLATFORM: Any CPU
 
