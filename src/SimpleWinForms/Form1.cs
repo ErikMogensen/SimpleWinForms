@@ -14,6 +14,7 @@ namespace SimpleWinForms
     {
         public Form1()
         {
+            // Initialize
             InitializeComponent();
         }
     }
