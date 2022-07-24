@@ -82,9 +82,18 @@ jobs:
     - name: Build
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}},FileVersion=${{env.Version}},Version=${{env.Version}} ${{env.SOLUTION_FILE_PATH}}
+      run: |
+        msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}},FileVersion=${{env.Version}},Version=${{env.Version}} ${{env.SOLUTION_FILE_PATH}}
+        Write-host "And the content is..."
+        get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
       env:
         Version: ${{ inputs.release-version }}
+
+
+    - name: Show AssemblyInfo.cs - post build
+      run: |
+         Write-host "Showing off"
+         get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
 
     # - name: See what we got
     #   run: dir  $env:GITHUB_WORKSPACE\BothFrameworks.Tests
