@@ -45,7 +45,7 @@ jobs:
       uses: actions/cache@v3.0.5
       with:
         path: src/SimpleWinForms/bin/Release
-        key: cached-output
+        key: cached-output-${{ github.sha }}
 
     - name: Did we get the cache
       if: steps.get-cached-build.outputs.cache-hit == 'true'
@@ -96,6 +96,7 @@ jobs:
     # missing $env:NupkgFilename on the gh command line
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
+        Start-Sleep 1 
         gh release upload ${{ env.RELEASE_VERSION }}  $env:ZipFilename 
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
