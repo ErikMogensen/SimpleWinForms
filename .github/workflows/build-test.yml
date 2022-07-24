@@ -61,13 +61,23 @@ jobs:
         echo "env version is ${{env.Version}}"
         echo "env version is $env:version"
 
+    - name: Show AssemblyInfo.cs - pre
+      run: |
+         Write-host "Showing off"
+         get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
+
     - name: Set versions on .NET Framework assemblies
       env:
         Version: ${{ inputs.release-version }}
       run: |
         .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyVersion' -Version ${{env.Version}}
         .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyFileVersion' -Version ${{env.Version}}
-        
+
+
+    - name: Show AssemblyInfo.cs - post
+      run: |
+         Write-host "Showing off"
+         get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
 
     - name: Build
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
