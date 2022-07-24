@@ -80,7 +80,7 @@ jobs:
 
 
     - name: See what we got
-      run: dir  $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release
+      run: Get-childitem -path $env:GITHUB_WORKSPACE -recurse
 
     - name: Cache build output
       uses: actions/cache@v3.0.5
