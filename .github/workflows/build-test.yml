@@ -65,8 +65,8 @@ jobs:
       env:
         Version: ${{ inputs.release-version }}
       run: |
-        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyVersion' -Version $env:version
-        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyFiileVersion' -Version ${{env.Version}}
+        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyVersion' -Version ${{env.Version}}
+        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyFileVersion' -Version ${{env.Version}}
         
 
     - name: Build
