@@ -70,7 +70,7 @@ jobs:
       env:
         Version: ${{ inputs.release-version }}
       run: |
-        $fileName = $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
+        $fileName = "$env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs"
         .\SetVersion -FileName $fileName -PropertyName 'AssemblyVersion' -Version ${{env.Version}}
         .\SetVersion -FileName $fileName -PropertyName 'AssemblyFileVersion' -Version ${{env.Version}}
 
