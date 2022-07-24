@@ -51,6 +51,13 @@ jobs:
     - name: Show version
       run: echo "inputs.release-version is ${{ inputs.release-version }}"
 
+    - name: Set versions on .NET Framework assemblies
+      env:
+        Version: ${{ inputs.release-version }}
+      run: |
+        .\SetVersion -FileName $env:GITHUB_WORKSPACE\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyVersion' -Version $env:VERSION
+        
+
     - name: Build
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
