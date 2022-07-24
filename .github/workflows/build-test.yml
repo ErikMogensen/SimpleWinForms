@@ -70,8 +70,9 @@ jobs:
       env:
         Version: ${{ inputs.release-version }}
       run: |
-        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyVersion' -Version ${{env.Version}}
-        .\SetVersion -FileName $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs -PropertyName 'AssemblyFileVersion' -Version ${{env.Version}}
+        $fileName = $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
+        .\SetVersion -FileName $fileName -PropertyName 'AssemblyVersion' -Version ${{env.Version}}
+        .\SetVersion -FileName $fileName -PropertyName 'AssemblyFileVersion' -Version ${{env.Version}}
 
 
     - name: Show AssemblyInfo.cs - post
@@ -88,12 +89,6 @@ jobs:
         get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
       env:
         Version: ${{ inputs.release-version }}
-
-
-    - name: Show AssemblyInfo.cs - post build
-      run: |
-         Write-host "Showing off"
-         get-content $env:GITHUB_WORKSPACE\src\SimpleWinForms\Properties\AssemblyInfo.cs
 
     # - name: See what we got
     #   run: dir  $env:GITHUB_WORKSPACE\BothFrameworks.Tests
