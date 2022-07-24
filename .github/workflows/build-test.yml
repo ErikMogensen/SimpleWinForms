@@ -51,6 +51,9 @@ jobs:
     - name: Show version
       run: echo "inputs.release-version is ${{ inputs.release-version }}"
 
+    - name: See what we got
+      run: Get-childitem -path $env:GITHUB_WORKSPACE -recurse
+
     - name: Set versions on .NET Framework assemblies
       env:
         Version: ${{ inputs.release-version }}
