@@ -63,25 +63,6 @@ jobs:
     - name: Show workspace
       run: echo "GITHUB_WORKSPACE using env $env:GITHUB_WORKSPACE"
 
-    #- name: Remove ALL xml files.
-    #  run: | 
-    #    Push-Location $env:GITHUB_WORKSPACE\MainApp\bin\Release\net462
-    #    Get-ChildItem -Include *.xml -Recurse | % { Remove-Item $_.FullName }
-    #    Pop-Location
-
-    #- name: Reset VERIFICATION file.
-    #  run:  |
-    #    (Set-Content -Value "VERIFICATION=MD5" -Path $env:GITHUB_WORKSPACE\VERIFICATION.txt)
-      
-    #- name: Generate verification file
-    #  run: .\Generate-VerificationFile.ps1 -Version $env:RELEASE_VERSION -TemplateFilePath VERIFICATION-Template.txt -ExePath "$env:GITHUB_WORKSPACE\MainApp\bin\Release\net462\MainApp.exe" -OutputFilePath "$env:GITHUB_WORKSPACE\MainApp\bin\Release\net462\VERIFICATION.txt"
-
-    #- name: Modify .nuspec file
-    #  run: (Get-Content $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec).Replace("`$version`$", "$env:RELEASE_VERSION") | Set-Content $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec
-
-    #- name: Pack Chocolatey 
-    #  run: choco pack $env:GITHUB_WORKSPACE\MainApp\MainApp.nuspec
-
     - name: Create filenames for zip and nupkg
       run: |
         $stepFilename = "simpleWinForms-$($env:RELEASE_VERSION)"
@@ -92,7 +73,7 @@ jobs:
    
     - name: Compress output
       run: |
-        7z a $env:ZipFilename $env:GITHUB_WORKSPACE\SimpleWinForms\bin\Release\*.*
+        7z a $env:ZipFilename $env:GITHUB_WORKSPACE\src\SimpleWinForms\bin\Release\*.*
         
     - name: Upload build output zipped
       working-directory: ${{env.GITHUB_WORKSPACE}}
