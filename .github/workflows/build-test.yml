@@ -85,7 +85,7 @@ jobs:
     - name: Cache build output
       uses: actions/cache@v3.0.5
       with:
-        path: MainApp/bin/Release/net462
+        path: src/SimpleWinForms/bin/Release
         key: cached-output
 
     - name: show build number works
