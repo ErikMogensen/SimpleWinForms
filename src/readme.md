@@ -1,1 +1,1 @@
-Just a simple project to test ci/cd with GitHub Actions.
+Just a simple project to test ci/cd with GitHub Actions. Does a change here trigger the PR flow?
