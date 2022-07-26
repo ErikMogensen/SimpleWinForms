@@ -1,0 +1,1 @@
+Just a simple project to test ci/cd with GitHub Actions.
