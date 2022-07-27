@@ -6,7 +6,7 @@ on:
       release-version:
         required: true
         type: string
-        default: 1.2.3
+        default: '1.2.3'
   workflow_dispatch:
 
 env:
