@@ -22,8 +22,6 @@ jobs:
       NUnitVersion: '3.15.2'
 
     steps:    
-    - name: Show dir
-
     - name: Install NUnit Console Runner
       run: Install-Package NUnit.ConsoleRunner -Force -RequiredVersion $env:NUnitVersion
 
