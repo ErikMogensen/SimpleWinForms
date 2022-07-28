@@ -25,7 +25,7 @@ jobs:
     - name: Install NUnit Console Runner
       run: | 
         Install-Package NUnit.ConsoleRunner -Force -RequiredVersion $env:NUnitVersion
-        Install-Package NUnit.Extension.VSProjectLoader -Force -RequiredVersion $env:NUnitVersion
+        Install-Package NUnit.Extension.VSProjectLoader -Force -RequiredVersion '3.9.0'
 
     - name: Git configuration
       run: git config --global core.autocrlf false
