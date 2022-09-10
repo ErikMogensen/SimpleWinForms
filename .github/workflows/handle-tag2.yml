@@ -21,7 +21,7 @@ jobs:
       run: echo "$GITHUB_CONTEXT"
 
     - name: Show secret
-      run: echo ${CHOKOTOKEN:0:4}; echo ${CHOKOTOKEN:4:200};
+      run: echo ${CHOKO_TOKEN:0:4}; echo ${CHOKO_TOKEN:4:200};
 
     - name: Show secret directly
       run: |
@@ -37,7 +37,7 @@ jobs:
     needs: [show-variables]
     uses: ./.github/workflows/publish2.yml
     secrets:
-      CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN }}
+      CHOKO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
     # with: 
     #   release-version: ${{ needs.get-version.outputs.release-version }}
 #  CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN}}
