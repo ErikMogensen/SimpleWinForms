@@ -23,6 +23,10 @@ jobs:
     - name: Show secret
       run: echo ${CHOKOTOKEN:0:4}; echo ${CHOKOTOKEN:4:200};
 
+    - name: Show secret directly
+      run: |
+        echo "Begins with $(${{ secrets.CHOKO_TOKEN }}.substring(0,3))"
+
     - name: Show secret through env
       env: 
         CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
