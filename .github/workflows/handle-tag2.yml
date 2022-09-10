@@ -25,7 +25,7 @@ jobs:
 
     - name: Show secret directly
       run: |
-        echo "Begins with $(${{ secrets.CHOKO_TOKEN }}.substring(0,3))"
+        echo "Begins with $("${{ secrets.CHOKO_TOKEN }}".substring(0,3))"
 
     - name: Show secret through env
       env: 

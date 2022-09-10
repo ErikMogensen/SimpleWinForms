@@ -27,11 +27,9 @@ jobs:
     - name: Show secret
       run: echo ${CHOKO_TOKEN:0:4}; echo ${CHOKO_TOKEN:4:200};
 
-    - name: Show secret through env
-      env: 
-        CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
+    - name: Show secret directly
       run: |
-        echo "Begins with $($env:CHOCO_TOKEN.substring(0,3))"
+        echo "Begins with $("${{ secrets.CHOKO_TOKEN }}".substring(0,3))"
 
     - name: Publish to Chocolatey
       env:
