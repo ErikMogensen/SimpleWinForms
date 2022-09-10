@@ -1,0 +1,34 @@
+name: Handle tag 2
+
+on:
+  push:
+    tags: 
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+      #- 'releases/[1-9]+.[0-9]+.[0-9]+'
+jobs:
+  show-variables:
+    needs: get-version
+    runs-on: windows-2022
+    steps:
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Show secret
+      run: echo ${CHOKOTOKEN:0:4}; echo ${CHOKOTOKEN:4:200};
+
+  publish-it:
+    needs: [show-variables]
+    uses: ./.github/workflows/publish2.yml
+    secrets:
+      CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN}}
+    # with: 
+    #   release-version: ${{ needs.get-version.outputs.release-version }}
+#  CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN}}

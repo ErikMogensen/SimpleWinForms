@@ -1,0 +1,57 @@
+name: publish
+  
+on: 
+  workflow_call:
+    secrets:
+      CHOKO_TOKEN: 
+        required: true
+    # inputs:
+    #   release-version:
+    #     required: true
+    #     type: string
+  workflow_dispatch:
+
+
+env:
+  SOLUTION_FILE_PATH: .
+  BUILD_CONFIGURATION: Release
+  PLATFORM: Any CPU
+
+
+jobs:
+  publish:
+    name: publish
+    runs-on: windows-2022
+    steps:
+
+    - name: Show secret
+      run: echo ${CHOKOTOKEN:0:4}; echo ${CHOKOTOKEN:4:200};
+
+    - name: Show secret through env
+      env: 
+        CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
+      run: |
+        echo $env:CHOCO_TOKEN.substring(0,3)
+
+    - name: Publish to Chocolatey
+      env:
+        CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
+      run: |
+        choco push "biscuit"  -k="$env:CHOCO_TOKEN"
+
+    - name: Dump env
+      run: env | sort
+   
+    - name: Dump GitHub context
+      env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+      
+    - name: Upload build output zipped
+    # missing $env:NupkgFilename on the gh command line
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        Start-Sleep 1 
+        gh release upload ${{ env.RELEASE_VERSION }}  $env:ZipFilename 
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
