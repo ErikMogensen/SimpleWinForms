@@ -31,7 +31,7 @@ jobs:
       env: 
         CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
       run: |
-        echo $env:CHOCO_TOKEN.substring(0,3)
+        echo "Begins with $($env:CHOCO_TOKEN.substring(0,3))"
 
     - name: Publish to Chocolatey
       env:
