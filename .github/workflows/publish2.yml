@@ -23,6 +23,7 @@ jobs:
     name: publish
     runs-on: windows-2022
     steps:
+    - uses: actions/checkout@v3
 
     - name: Show secret
       run: echo ${CHOKO_TOKEN:0:4}; echo ${CHOKO_TOKEN:4:200};
@@ -31,11 +32,17 @@ jobs:
       run: |
         echo "Begins with $("${{ secrets.CHOKO_TOKEN }}".substring(0,3))"
 
+    - name: Show secret through env
+      env: 
+        CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
+      run: |
+        echo "Begins with $($env:CHOCO_TOKEN.substring(0,3))"
+
     - name: Publish to Chocolatey
       env:
         CHOCO_TOKEN: ${{ secrets.CHOKO_TOKEN }}
       run: |
-        choco push "biscuit"  -k="$env:CHOCO_TOKEN"
+        choco push "$env:GITHUB_WORKSPACE\sr\readme.md"  -k="$env:CHOCO_TOKEN"
 
     - name: Dump env
       run: env | sort
