@@ -33,7 +33,7 @@ jobs:
     needs: [show-variables]
     uses: ./.github/workflows/publish2.yml
     secrets:
-      CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN}}
+      CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN }}
     # with: 
     #   release-version: ${{ needs.get-version.outputs.release-version }}
 #  CHOKO_TOKEN: ${{ secrets.CHOKOTOKEN}}
