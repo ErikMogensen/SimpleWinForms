@@ -101,7 +101,7 @@ jobs:
     #    if ($process.ExitCode -ne 0) {throw "Unit tests failed (exit code = $($process.ExitCode))" }
 
 
-    - name: See what we got
+    - name: See what we got on disk
       run: Get-childitem -path $env:GITHUB_WORKSPACE -recurse
 
     - name: Cache build output
